@@ -1,6 +1,7 @@
 // Dependencies
 var d3 = require('d3');
 var request = require('d3-request');
+require("d3-geo-projection")(d3);
 var topojson = require('topojson');
 var _ = require('lodash');
 
@@ -9,13 +10,18 @@ var throttle = require('./throttle');
 var features = require('./detectFeatures')();
 
 // Globals
+var MOBILE_THRESHOLD = 600;
 var PLAYBACK_SPEED = 500;
+var LABELS = [
+	{}
+];
 
 var bordersData = null;
 var attacksData = null;
 var yearElement = null;
 var playButtonElement = null;
 
+var isMobile = false;
 var playbackYear = 2006;
 var isPlaying = false;
 
@@ -46,6 +52,12 @@ function onPlayButtonClicked() {
 
 function render() {
 	var width = $('#interactive-content').width();
+
+	if (width <= MOBILE_THRESHOLD) {
+			isMobile = true;
+	} else {
+			isMobile = false;
+	}
 
 	renderMap({
 		container: '#interactive-content',
@@ -95,10 +107,10 @@ function renderMap(config) {
     var chartWidth = config['width'] - (margins['left'] + margins['right']);
     var chartHeight = config['height'] - (margins['top'] + margins['bottom']);
 
-		var projection = d3.geo.mercator()
+		var projection = d3.geo.cylindricalEqualArea()
 			.center([60, 0])
 	    .translate([config['width'] / 2, config['height'] / 2])
-			.scale(config['width'] / 3.5);
+			.scale(config['width'] / 3);
 
 		var geoPath = d3.geo.path()
 			.projection(projection)
@@ -120,13 +132,34 @@ function renderMap(config) {
 			.append('g')
 			.attr('transform', 'translate(' + margins['left'] + ',' + margins['top'] + ')');
 
-		var borders = chartElement.append('g')
-			.attr('class', 'borders');
+		/*
+		 * Create filters.
+		 */
+		var filters = chartElement.append('filters');
 
-		borders.append('path')
+		var landFilter = filters.append('filter')
+      .attr('id', 'landshadow');
+
+    landFilter.append('feGaussianBlur')
+      .attr('in', 'SourceGraphic')
+      .attr('result', 'blurOut')
+      .attr('stdDeviation', '2');
+
+		/*
+		 * Create geographic elements.
+		 */
+		chartElement.append('path')
+      .attr('class', 'landmass')
+      .datum(config['borders'])
+      .attr('filter', 'url(#landshadow)')
+      .attr('d', geoPath);
+
+		chartElement.append('path')
+			.attr('class', 'borders')
 		  .datum(config['borders'])
 		  .attr('d', geoPath);
 
+		// Attacks
 		var attacks = chartElement.append('g')
 			.attr('class', 'attacks');
 

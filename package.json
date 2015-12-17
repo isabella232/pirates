@@ -9,6 +9,7 @@
   "author": "Nikhil Sonnad",
   "license": "ISC",
   "dependencies": {
+    "d3-geo-projection": "^0.2.15",
     "d3-request": "^0.2.3",
     "lodash": "^3.10.1",
     "topojson": "^1.6.19"
