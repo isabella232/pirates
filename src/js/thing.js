@@ -1,28 +1,47 @@
+// Dependencies
 var d3 = require('d3');
 var request = require('d3-request');
 var topojson = require('topojson');
+var _ = require('lodash');
 
 var fm = require('./fm');
 var throttle = require('./throttle');
 var features = require('./detectFeatures')();
 
-var BORDERS = null;
-var ATTACKS = null;
+// Globals
+var PLAYBACK_SPEED = 500;
+
+var bordersData = null;
+var attacksData = null;
+var yearElement = null;
+var playButtonElement = null;
+
+var playbackYear = 2006;
+var isPlaying = false;
 
 function init() {
-	request.json('data/borders-topo.json', function(error, data) {
-		BORDERS = topojson.feature(data, data['objects']['ne_110m_admin_0_countries']);
+	yearElement = d3.select('#year');
+	playButtonElement = d3.select('#play')
 
-		console.log(BORDERS);
+	request.json('data/borders-topo.json', function(error, data) {
+		bordersData = topojson.feature(data, data['objects']['ne_110m_admin_0_countries']);
 
 		request.json('data/attacks.json', function(error, data) {
-			ATTACKS = data;
+			attacksData = data;
 
-			console.log(ATTACKS);
+			playButtonElement.on('click', onPlayButtonClicked);
 
 			render();
 		});
 	});
+}
+
+function onPlayButtonClicked() {
+	d3.event.preventDefault();
+
+	playbackYear = 2006;
+	isPlaying = true;
+	render();
 }
 
 function render() {
@@ -32,12 +51,25 @@ function render() {
 		container: '#interactive-content',
 		width: width,
 		height: width / 2,
-		borders: BORDERS,
-		attacks: ATTACKS['2015']
+		borders: bordersData,
+		attacks: attacksData[playbackYear.toString()]
 	});
+
+	yearElement.text(playbackYear)
 
 	// adjust iframe for dynamic content
 	fm.resize()
+
+	if (isPlaying) {
+		playbackYear = playbackYear + 1;
+
+		if (playbackYear > 2015) {
+			playbackYear = 2006;
+			isPlaying = false;
+		} else {
+			_.delay(render, PLAYBACK_SPEED);
+		}
+	}
 }
 
 function resize() {
@@ -64,8 +96,9 @@ function renderMap(config) {
     var chartHeight = config['height'] - (margins['top'] + margins['bottom']);
 
 		var projection = d3.geo.mercator()
-			.scale(200)
-	    .translate([chartWidth / 2, chartHeight / 2]);
+			.center([60, 0])
+	    .translate([config['width'] / 2, config['height'] / 2])
+			.scale(config['width'] / 3.5);
 
 		var geoPath = d3.geo.path()
 			.projection(projection)
@@ -86,8 +119,6 @@ function renderMap(config) {
 			.attr('height', chartHeight + margins['top'] + margins['bottom'])
 			.append('g')
 			.attr('transform', 'translate(' + margins['left'] + ',' + margins['top'] + ')');
-
-		console.log(config['borders']);
 
 		var borders = chartElement.append('g')
 			.attr('class', 'borders');
