@@ -8,7 +8,10 @@
   },
   "author": "Nikhil Sonnad",
   "license": "ISC",
-  "dependencies": {},
+  "dependencies": {
+    "d3-request": "^0.2.3",
+    "topojson": "^1.6.19"
+  },
   "devDependencies": {
     "archieml": "^0.3.1",
     "browser-sync": "^2.9.11",

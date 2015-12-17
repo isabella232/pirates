@@ -1,16 +1,27 @@
+var d3 = require('d3');
+var request = require('d3-request');
+var topojson = require('topojson');
+
 var fm = require('./fm');
 var throttle = require('./throttle');
 var features = require('./detectFeatures')();
-var d3 = require('d3');
-var request = require('d3-request');
 
-var DATA = null;
+var BORDERS = null;
+var ATTACKS = null;
 
 function init() {
-	request.json('data/attacks.json', function(error, data) {
-		DATA = data;
+	request.json('data/borders-topo.json', function(error, data) {
+		BORDERS = topojson.feature(data, data['objects']['ne_110m_admin_0_countries']);
 
-		render();
+		console.log(BORDERS);
+
+		request.json('data/attacks.json', function(error, data) {
+			ATTACKS = data;
+
+			console.log(ATTACKS);
+
+			render();
+		});
 	});
 }
 
@@ -21,7 +32,8 @@ function render() {
 		container: '#interactive-content',
 		width: width,
 		height: width / 2,
-		data: DATA['2015']
+		borders: BORDERS,
+		attacks: ATTACKS['2015']
 	});
 
 	// adjust iframe for dynamic content
@@ -29,7 +41,7 @@ function render() {
 }
 
 function resize() {
-	update()
+	render()
 	fm.resize()
 }
 
@@ -52,12 +64,12 @@ function renderMap(config) {
     var chartHeight = config['height'] - (margins['top'] + margins['bottom']);
 
 		var projection = d3.geo.mercator()
-	    // .center([0, 5])
-	    // .scale(900)
-	    // .rotate([-180,0]);
+			.scale(200)
+	    .translate([chartWidth / 2, chartHeight / 2]);
 
 		var geoPath = d3.geo.path()
-			.projection(projection);
+			.projection(projection)
+			.pointRadius(3);
 
     // Clear existing graphic (for redraw)
     var containerElement = d3.select(config['container']);
@@ -75,10 +87,20 @@ function renderMap(config) {
 			.append('g')
 			.attr('transform', 'translate(' + margins['left'] + ',' + margins['top'] + ')');
 
-		console.log(config['data']);
+		console.log(config['borders']);
 
-		chartElement.selectAll('path')
-		  .data(config['data'])
+		var borders = chartElement.append('g')
+			.attr('class', 'borders');
+
+		borders.append('path')
+		  .datum(config['borders'])
+		  .attr('d', geoPath);
+
+		var attacks = chartElement.append('g')
+			.attr('class', 'attacks');
+
+		attacks.selectAll('path')
+		  .data(config['attacks'])
 		  .enter().append('path')
 		  .attr('d', geoPath);
 }
