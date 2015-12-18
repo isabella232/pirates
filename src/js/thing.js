@@ -10,6 +10,7 @@ var throttle = require('./throttle');
 var features = require('./detectFeatures')();
 
 // Globals
+var DEFAULT_WIDTH = 940;
 var MOBILE_THRESHOLD = 600;
 var PLAYBACK_SPEED = 500;
 var LABELS = [
@@ -62,7 +63,6 @@ function render() {
 	renderMap({
 		container: '#interactive-content',
 		width: width,
-		height: width / 2,
 		borders: bordersData,
 		attacks: attacksData[playbackYear.toString()]
 	});
@@ -96,6 +96,10 @@ function renderMap(config) {
     /*
      * Setup
      */
+		var aspectRatio = 5 / 3;
+		var defaultScale = 320;
+		var defaultDotSize = 3;
+
     var margins = {
       top: 0,
       right: 0,
@@ -104,17 +108,24 @@ function renderMap(config) {
     };
 
     // Calculate actual chart dimensions
-    var chartWidth = config['width'] - (margins['left'] + margins['right']);
-    var chartHeight = config['height'] - (margins['top'] + margins['bottom']);
+		var width = config['width'];
+		var height = width / aspectRatio;
+
+    var chartWidth = width - (margins['left'] + margins['right']);
+    var chartHeight = height - (margins['top'] + margins['bottom']);
+
+		var mapCenter = [60, 0];
+		var scaleFactor = chartWidth / DEFAULT_WIDTH;
+		var mapScale = scaleFactor * defaultScale;
 
 		var projection = d3.geo.cylindricalEqualArea()
-			.center([60, 0])
-	    .translate([config['width'] / 2, config['height'] / 2])
-			.scale(config['width'] / 3);
+			.center(mapCenter)
+	    .translate([width / 2, height / 2])
+			.scale(mapScale);
 
 		var geoPath = d3.geo.path()
 			.projection(projection)
-			.pointRadius(3);
+			.pointRadius(defaultDotSize * scaleFactor);
 
     // Clear existing graphic (for redraw)
     var containerElement = d3.select(config['container']);
