@@ -1,13 +1,13 @@
 // Interactive-specific css here
 
 svg {
-  background-color: lightblue;
+  background-color: $qz-map-water;
 }
 
 path.borders {
-  stroke: gray;
+  stroke: $qz-map-land-stroke;
   stroke-width: 1px;
-  fill: lightgray;
+  fill: $qz-map-land-fill;
 }
 
 .attacks path {
@@ -17,4 +17,17 @@ path.borders {
   fill: red;
   opacity: 0.5;
   width: 50%;
+}
+
+.labels text {
+    fill: #787878;
+    font-family: Helvetica, Arial, sans-serif;
+    -webkit-font-smoothing: antialiased;
+}
+
+.labels.shadow text {
+    fill: #fff;
+    stroke: #fff;
+    stroke-width: 2px;
+    opacity: .7;
 }

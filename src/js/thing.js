@@ -13,8 +13,43 @@ var features = require('./detectFeatures')();
 var DEFAULT_WIDTH = 940;
 var MOBILE_THRESHOLD = 600;
 var PLAYBACK_SPEED = 500;
+var LABEL_DEFAULTS = {
+    'text-anchor': 'middle',
+		'font-size': 1.0,
+		'rotate': 0
+};
+
 var LABELS = [
-	{}
+	{
+		'text': 'Arabian Sea',
+		'loc': [64, 13],
+		'font-size': 0.9
+	}, {
+		'text': 'Indian Ocean',
+		'loc': [78, -20],
+		'font-size': 1.5
+	}, {
+		'text': '<tspan dx="3.5%">South</tspan><tspan dx="-3.5%" dy="2.5%">China Sea</tspan>',
+		'loc': [109, 16],
+		'font-size': 0.6
+	}, {
+		'text': '<tspan dx="3.5%">East</tspan><tspan dx="-3.5%" dy="2.5%">China Sea</tspan>',
+		'loc': [121, 30],
+		'font-size': 0.6
+	}, {
+		'text': 'Bay of Bengal',
+		'loc': [89, 12],
+		'font-size': 0.6
+	}, {
+		'text': 'Gulf of Guinea',
+		'loc': [2, 2],
+		'font-size': 0.6
+	}, {
+		'text': 'Somalia',
+		'loc': [45.5, 3.25],
+		'font-size': 0.7,
+		'rotate': -38
+	}
 ];
 
 var bordersData = null;
@@ -97,7 +132,7 @@ function renderMap(config) {
      * Setup
      */
 		var aspectRatio = 5 / 3;
-		var defaultScale = 320;
+		var defaultScale = 330;
 		var defaultDotSize = 3;
 
     var margins = {
@@ -148,13 +183,21 @@ function renderMap(config) {
 		 */
 		var filters = chartElement.append('filters');
 
+		var textFilter = filters.append('filter')
+     .attr('id', 'textshadow');
+
+   	textFilter.append('feGaussianBlur')
+     .attr('in', 'SourceGraphic')
+     .attr('result', 'blurOut')
+     .attr('stdDeviation', '.25');
+
 		var landFilter = filters.append('filter')
       .attr('id', 'landshadow');
 
     landFilter.append('feGaussianBlur')
       .attr('in', 'SourceGraphic')
       .attr('result', 'blurOut')
-      .attr('stdDeviation', '2');
+      .attr('stdDeviation', '3');
 
 		/*
 		 * Create geographic elements.
@@ -162,24 +205,56 @@ function renderMap(config) {
 		chartElement.append('path')
       .attr('class', 'landmass')
       .datum(config['borders'])
-      .attr('filter', 'url(#landshadow)')
-      .attr('d', geoPath);
+	      // .attr('filter', 'url(#landshadow)')
+	      .attr('d', geoPath);
 
 		chartElement.append('path')
 			.attr('class', 'borders')
 		  .datum(config['borders'])
-		  .attr('d', geoPath);
+			  .attr('d', geoPath);
+
+		/*
+     * Render place labels.
+     */
+    var layers = [
+      'labels shadow',
+      'labels'
+    ];
+
+    layers.forEach(function(layer) {
+      chartElement.append('g')
+        .attr('class', layer)
+        .selectAll('.label')
+        .data(LABELS)
+        .enter().append('text')
+          .attr('class', 'label')
+          .attr('transform', function(d) {
+						var rotate = d['rotate'] || LABEL_DEFAULTS['rotate'];
+            return 'translate(' + projection(d['loc']) + ') rotate(' + rotate + ')';
+          })
+          .style('text-anchor', function(d) {
+						return d['text-anchor'] || LABEL_DEFAULTS['text-anchor'];
+					})
+					.style('font-size', function(d) {
+						return ((d['font-size'] || LABEL_DEFAULTS['font-size']) * scaleFactor * 100).toString() + '%';
+          })
+          .html(function(d) {
+            return d['text'];
+          });
+    });
+
+    d3.selectAll('.shadow')
+      // .attr('filter', 'url(#textshadow)');
 
 		// Attacks
 		var attacks = chartElement.append('g')
 			.attr('class', 'attacks');
 
 		attacks.selectAll('path')
-		  .data(config['attacks'])
-		  .enter().append('path')
-		  .attr('d', geoPath);
+			.data(config['attacks'])
+			.enter().append('path')
+				.attr('d', geoPath);
 }
-
 
 $(document).ready(function () {
 	fm.resize()
