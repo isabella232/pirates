@@ -262,10 +262,10 @@ function renderMap(config) {
 
 			somalia.append('text')
 	      .attr('transform', function(d) {
-	        return 'translate(' + projection([55.5, -2.5]) + ')';
+	        return 'translate(' + projection([55.5, -3]) + ')';
 	      })
 	      .style('text-anchor', 'middle')
-				.style('font-size', (100 * scaleFactor) + '%')
+				.style('font-size', (125 * scaleFactor) + '%')
 	      .html(function(d) {
 	        return 'Somalia';
 	      });
