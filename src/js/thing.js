@@ -44,11 +44,6 @@ var LABELS = [
 		'text': 'Gulf of Guinea',
 		'loc': [2, 2],
 		'font-size': 0.6
-	}, {
-		'text': 'Somalia',
-		'loc': [45.5, 3.25],
-		'font-size': 0.7,
-		'rotate': -38
 	}
 ];
 
@@ -61,6 +56,7 @@ var isMobile = false;
 var playbackYear = 2006;
 var isPlaying = false;
 var hasPlayed = false;
+var restarting = false;
 
 function init() {
 	request.json('data/borders-topo.json', function(error, data) {
@@ -77,6 +73,10 @@ function init() {
 function onPlayButtonClicked() {
 	d3.event.preventDefault();
 
+	if (playbackYear == 2015) {
+		restarting = true;
+	}
+
 	playbackYear = 2006;
 	isPlaying = true;
 	render();
@@ -92,11 +92,16 @@ function render() {
 	}
 
 	if (isPlaying) {
-		playbackYear = playbackYear + 1;
+		// Don't immediately advance if just showing 2006
+		if (restarting) {
+			restarting = false;
+		} else {
+			playbackYear = playbackYear + 1;
 
-		if (playbackYear == 2015) {
-			isPlaying = false;
-			hasPlayed = true;
+			if (playbackYear == 2015) {
+				isPlaying = false;
+				hasPlayed = true;
+			}
 		}
 	}
 
@@ -210,6 +215,47 @@ function renderMap(config) {
 	        .html(function(d) {
 	          return d['text'];
 	        });
+		}
+
+		// Somalia label
+		if (!isPlaying) {
+			var line = d3.svg.line()
+				.interpolate('basis')
+				.x(function(d) {
+					console.log(d);
+					return projection(d)[0];
+				})
+				.y(function(d) {
+					return projection(d)[1];
+				});
+
+			var somalia = chartElement.append('g')
+				.attr('class', 'somalia');
+
+			somalia.append('path')
+				.attr('d', line([
+					[55.5, 0],
+					// [55.5, 4],
+					[46, 4]
+				]))
+				.style('stroke-width', 3 * scaleFactor);
+
+			somalia.append('text')
+	      .attr('transform', function(d) {
+	        return 'translate(' + projection([56, -0.5]) + ')';
+	      })
+	      .style('text-anchor', 'start')
+				.style('dominant-baseline', 'middle')
+				.style('font-size', (150 * scaleFactor) + '%')
+	      .html(function(d) {
+	        return 'Somalia';
+	      });
+
+			somalia.append('circle')
+	      .attr('transform', function(d) {
+	        return 'translate(' + projection([46, 4]) + ')';
+	      })
+				.attr('r', 5 * scaleFactor);
 		}
 
 		// Attacks

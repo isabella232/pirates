@@ -33,7 +33,7 @@ var _year = new Date().getFullYear().toString();
 
 var qzdataPath = process.env.QZDATA_PATH || '/Users/cgroskopf/src/qzdata';
 var thingName = 'pirates';
-var thingPath = qzdataPath + '/' + 'y';
+var thingPath = qzdataPath + '/' + '2015/' + thingName;
 
 var isProd = args.build ? true : false;
 var env = isProd ? "prod" : "dev";
@@ -211,4 +211,3 @@ if (args.build) {
     gulp.start("browser-sync");
   });
 }
-

@@ -26,13 +26,6 @@ path.borders {
   -webkit-font-smoothing: antialiased;
 }
 
-.labels.shadow text {
-  fill: #fff;
-  stroke: #fff;
-  stroke-width: 2px;
-  opacity: .7;
-}
-
 text.year {
   fill: $qz-map-highlight;
   font-family: Helvetica, Arial, sans-serif;
@@ -40,6 +33,26 @@ text.year {
   text-anchor: middle;
   font-size: 750%;
   opacity: 0.5;
+}
+
+.somalia {
+  path {
+    stroke: $qz-map-highlight;
+    fill: none;
+    // opacity: 0.5;
+  }
+
+  text {
+    fill: $qz-map-highlight;
+    font-family: Helvetica, Arial, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    // opacity: 0.5;
+  }
+
+  circle {
+    fill: $qz-map-highlight
+    // opacity: 0.5;
+  }
 }
 
 .controls {
@@ -59,5 +72,11 @@ text.year {
       fill: $qz-purp-1;
       cursor: pointer;
     }
+  }
+}
+
+@media screen and (max-width: 600px) {
+  .attacks path {
+    stroke-width: 0;
   }
 }
