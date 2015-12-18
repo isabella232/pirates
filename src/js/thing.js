@@ -285,11 +285,11 @@ function renderMap(config) {
 			.text(playbackYear)
 
 		// Play button
-		if (!isPlaying) {
-			var controls = chartElement.append('g')
-				.attr('class', 'controls')
-				.attr('transform', 'translate(' + projection([67, -30]) + ') scale(' + scaleFactor + ')')
+		var controls = chartElement.append('g')
+			.attr('class', 'controls')
+			.attr('transform', 'translate(' + projection([67, -30]) + ') scale(' + scaleFactor + ')')
 
+    if (!isPlaying) {
 			controls.append('polygon')
 				.attr('points', '0,0 0,40 40,20')
 
