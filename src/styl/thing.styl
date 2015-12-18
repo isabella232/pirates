@@ -27,6 +27,7 @@ svg {
   fill: $qz-gray-3;
   font-family: 'AdelleSans-Regular', Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
+  font-size:
 }
 
 text.year {
@@ -67,8 +68,16 @@ path.arrow {
   &:hover {
     path, polygon, text.play {
       fill: $qz-purp-1;
-      cursor: pointer;
     }
+  }
+}
+
+.play {
+  fill: blue;
+  opacity: 0;
+
+  &:hover {
+    cursor: pointer;
   }
 }
 

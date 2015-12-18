@@ -27,9 +27,9 @@ var LABELS = [
 		'text': '<tspan dx="3.5%">South</tspan><tspan dx="-3.5%" dy="2%">China Sea</tspan>',
 		'loc': [109, 16]
 	}, {
-		'text': '<tspan dx="3.5%">East</tspan><tspan dx="-3.5%" dy="2%">China Sea</tspan>',
-		'loc': [121, 30]
-	}, {
+	// 	'text': '<tspan dx="3.5%">East</tspan><tspan dx="-3.5%" dy="2%">China Sea</tspan>',
+	// 	'loc': [121, 30]
+	// }, {
 		'text': 'Bay of Bengal',
 		'loc': [89, 12]
 	}, {
@@ -126,8 +126,8 @@ function renderMap(config) {
     /*
      * Setup
      */
-		var aspectRatio = 5 / 3;
-		var defaultScale = 330;
+		var aspectRatio = 5 / 3.2;
+		var defaultScale = 350;
 		var defaultDotSize = 3;
 
     var margins = {
@@ -144,7 +144,7 @@ function renderMap(config) {
     var chartWidth = width - (margins['left'] + margins['right']);
     var chartHeight = height - (margins['top'] + margins['bottom']);
 
-		var mapCenter = [55, 8	];
+		var mapCenter = [53, 8];
 		var scaleFactor = chartWidth / DEFAULT_WIDTH;
 		var mapScale = scaleFactor * defaultScale;
 
@@ -178,8 +178,6 @@ function renderMap(config) {
 		 */
 		 var borders = chartElement.append('g')
  			.attr('class', 'borders');
-
-			console.log(config['borders'])
 
  		borders.selectAll('path')
  			.data(config['borders']['features'])
@@ -291,16 +289,25 @@ function renderMap(config) {
 			var controls = chartElement.append('g')
 				.attr('class', 'controls')
 				.attr('transform', 'translate(' + projection([67, -30]) + ') scale(' + scaleFactor + ')')
-				.on('click', onPlayButtonClicked);
 
 			controls.append('polygon')
 				.attr('points', '0,0 0,40 40,20')
 
 			controls.append('text')
-				.attr('class', 'play')
 				.attr('dx', 50)
 				.attr('dy', 35)
 				.text('Play')
+
+			var nw = projection([65, -28]);
+			var se = projection([95, -42]);
+
+			// Click area
+			chartElement.append('rect')
+				.attr('class', 'play')
+				.attr('transform', 'translate(' + nw + ')')
+				.attr('width', se[0] - nw[0])
+				.attr('height', se[1] - nw[1])
+				.on('click', onPlayButtonClicked);
 		}
 }
 
