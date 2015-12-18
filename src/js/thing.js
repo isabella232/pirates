@@ -15,35 +15,29 @@ var MOBILE_THRESHOLD = 600;
 var PLAYBACK_SPEED = 900;
 var LABEL_DEFAULTS = {
     'text-anchor': 'middle',
-		'font-size': 1.0,
+		'font-size': 0.6,
 		'rotate': 0
 };
 
 var LABELS = [
 	{
 		'text': 'Arabian Sea',
-		'loc': [64, 13],
-		'font-size': 0.9
+		'loc': [64, 15]
 	}, {
-	// 	'text': 'Indian Ocean',
-	// 	'loc': [75, -15],
-	// 	'font-size': 1.5
-	// }, {
-		'text': '<tspan dx="3.5%">South</tspan><tspan dx="-3.5%" dy="2.5%">China Sea</tspan>',
-		'loc': [109, 16],
-		'font-size': 0.6
+		'text': '<tspan dx="3.5%">South</tspan><tspan dx="-3.5%" dy="2%">China Sea</tspan>',
+		'loc': [109, 16]
 	}, {
-		'text': '<tspan dx="3.5%">East</tspan><tspan dx="-3.5%" dy="2.5%">China Sea</tspan>',
-		'loc': [121, 30],
-		'font-size': 0.6
+		'text': '<tspan dx="3.5%">East</tspan><tspan dx="-3.5%" dy="2%">China Sea</tspan>',
+		'loc': [121, 30]
 	}, {
 		'text': 'Bay of Bengal',
-		'loc': [89, 12],
-		'font-size': 0.6
+		'loc': [89, 12]
 	}, {
 		'text': 'Gulf of Guinea',
-		'loc': [2, 2],
-		'font-size': 0.6
+		'loc': [2, 2]
+	}, {
+		'text': 'Strait of Malacca',
+		'loc': [90, -2]
 	}
 ];
 
@@ -150,7 +144,7 @@ function renderMap(config) {
     var chartWidth = width - (margins['left'] + margins['right']);
     var chartHeight = height - (margins['top'] + margins['bottom']);
 
-		var mapCenter = [60, 0];
+		var mapCenter = [55, 8	];
 		var scaleFactor = chartWidth / DEFAULT_WIDTH;
 		var mapScale = scaleFactor * defaultScale;
 
@@ -182,19 +176,45 @@ function renderMap(config) {
 		/*
 		 * Create geographic elements.
 		 */
-		chartElement.append('path')
-      .attr('class', 'landmass')
-      .datum(config['borders'])
-	      .attr('d', geoPath);
+		 var borders = chartElement.append('g')
+ 			.attr('class', 'borders');
 
-		chartElement.append('path')
-			.attr('class', 'borders')
-		  .datum(config['borders'])
-			  .attr('d', geoPath);
+			console.log(config['borders'])
+
+ 		borders.selectAll('path')
+ 			.data(config['borders']['features'])
+ 			.enter().append('path')
+				.attr('id', function(d) {
+					return d['id'];
+				})
+ 				.attr('d', geoPath);
 
 		/*
      * Render place labels.
      */
+	 	chartElement.append('defs')
+	 		.append('marker')
+	 		.attr('id','arrowhead')
+	 		.attr('orient','auto')
+	 		.attr('viewBox','0 0 5.108 8.18')
+	 		.attr('markerHeight','8.18')
+	 		.attr('markerWidth','5.108')
+	 		.attr('orient','auto')
+	 		.attr('refY','4.09')
+	 		.attr('refX','5')
+	 		.append('polygon')
+	 		.attr('points','0.745,8.05 0.07,7.312 3.71,3.986 0.127,0.599 0.815,-0.129 5.179,3.999')
+	 		.attr('fill','#4C4C4C')
+
+		var arrowLine = d3.svg.line()
+			.interpolate('basis')
+			.x(function(d) {
+				return projection(d)[0];
+			})
+			.y(function(d) {
+				return projection(d)[1];
+			});
+
 		if (!isMobile) {
 	    chartElement.append('g')
 	      .attr('class', 'labels')
@@ -215,47 +235,40 @@ function renderMap(config) {
 	        .html(function(d) {
 	          return d['text'];
 	        });
+
+			chartElement.append('path')
+				.attr('class', 'arrow')
+				.attr('d', arrowLine([
+					[90, 0],
+					[92, 3],
+					[100.5, 3]
+				]))
+				.style('marker-end', 'url(#arrowhead)');
 		}
 
 		// Somalia label
 		if (!isPlaying) {
-			var line = d3.svg.line()
-				.interpolate('basis')
-				.x(function(d) {
-					console.log(d);
-					return projection(d)[0];
-				})
-				.y(function(d) {
-					return projection(d)[1];
-				});
-
 			var somalia = chartElement.append('g')
 				.attr('class', 'somalia');
 
 			somalia.append('path')
-				.attr('d', line([
+				.attr('class', 'arrow')
+				.attr('d', arrowLine([
 					[55.5, 0],
-					// [55.5, 4],
+					[55.5, 4],
 					[46, 4]
 				]))
-				.style('stroke-width', 3 * scaleFactor);
+				.style('marker-end', 'url(#arrowhead)');
 
 			somalia.append('text')
 	      .attr('transform', function(d) {
-	        return 'translate(' + projection([56, -0.5]) + ')';
+	        return 'translate(' + projection([55.5, -2.5]) + ')';
 	      })
-	      .style('text-anchor', 'start')
-				.style('dominant-baseline', 'middle')
-				.style('font-size', (150 * scaleFactor) + '%')
+	      .style('text-anchor', 'middle')
+				.style('font-size', (100 * scaleFactor) + '%')
 	      .html(function(d) {
 	        return 'Somalia';
 	      });
-
-			somalia.append('circle')
-	      .attr('transform', function(d) {
-	        return 'translate(' + projection([46, 4]) + ')';
-	      })
-				.attr('r', 5 * scaleFactor);
 		}
 
 		// Attacks
@@ -270,14 +283,14 @@ function renderMap(config) {
 		// Year button
 		chartElement.append('text')
 			.attr('class', 'year')
-			.attr('transform', 'translate(' + projection([80, -30]) + ') scale(' + scaleFactor + ')')
+			.attr('transform', 'translate(' + projection([80, -25]) + ') scale(' + scaleFactor + ')')
 			.text(playbackYear)
 
 		// Play button
 		if (!isPlaying) {
 			var controls = chartElement.append('g')
 				.attr('class', 'controls')
-				.attr('transform', 'translate(' + projection([67, -38]) + ') scale(' + scaleFactor + ')')
+				.attr('transform', 'translate(' + projection([67, -30]) + ') scale(' + scaleFactor + ')')
 				.on('click', onPlayButtonClicked);
 
 			controls.append('polygon')

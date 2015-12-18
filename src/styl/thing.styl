@@ -2,17 +2,20 @@
 
 svg {
   background-color: $qz-map-water;
-  border: 1px solid $qz-map-land-fill;
 }
 
-path.borders {
+.borders path {
   stroke: $qz-map-land-stroke;
   stroke-width: 1px;
   fill: $qz-map-land-fill;
+
+  &#SOM {
+    fill: $qz-gray-2;
+  }
 }
 
 .attacks path {
-  stroke: black;
+  stroke: $qz-background-gray;
   stroke-width: 1px;
   stroke-opacity: 50%;
   fill: $qz-map-highlight;
@@ -21,48 +24,42 @@ path.borders {
 }
 
 .labels text {
-  fill: #787878;
-  font-family: Helvetica, Arial, sans-serif;
+  fill: $qz-gray-3;
+  font-family: 'AdelleSans-Regular', Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
 }
 
 text.year {
   fill: $qz-map-highlight;
-  font-family: Helvetica, Arial, sans-serif;
+  font-family: 'AdelleSans-Regular', Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
   text-anchor: middle;
   font-size: 750%;
   opacity: 0.5;
 }
 
+path.arrow {
+  stroke-width: 1px;
+  stroke: $qz-body-black;
+  fill: none;
+}
+
 .somalia {
-  path {
-    stroke: $qz-map-highlight;
-    fill: none;
-    // opacity: 0.5;
-  }
-
   text {
-    fill: $qz-map-highlight;
-    font-family: Helvetica, Arial, sans-serif;
+    fill: $qz-body-black;
+    font-family: 'AdelleSans-Bold', Helvetica, Arial, sans-serif;
     -webkit-font-smoothing: antialiased;
-    // opacity: 0.5;
-  }
-
-  circle {
-    fill: $qz-map-highlight
-    // opacity: 0.5;
   }
 }
 
 .controls {
   polygon {
-    fill: $qz-map-highlight
+    fill: $qz-map-highlight;
   }
 
   text {
     fill: $qz-map-highlight;
-    font-family: Helvetica, Arial, sans-serif;
+    font-family: 'AdelleSans-Regular', Helvetica, Arial, sans-serif;
     -webkit-font-smoothing: antialiased;
     font-size: 300%;
   }
