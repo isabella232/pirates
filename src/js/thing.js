@@ -12,7 +12,7 @@ var features = require('./detectFeatures')();
 // Globals
 var DEFAULT_WIDTH = 940;
 var MOBILE_THRESHOLD = 600;
-var PLAYBACK_SPEED = 500;
+var PLAYBACK_SPEED = 900;
 var LABEL_DEFAULTS = {
     'text-anchor': 'middle',
 		'font-size': 1.0,
@@ -25,10 +25,10 @@ var LABELS = [
 		'loc': [64, 13],
 		'font-size': 0.9
 	}, {
-		'text': 'Indian Ocean',
-		'loc': [78, -20],
-		'font-size': 1.5
-	}, {
+	// 	'text': 'Indian Ocean',
+	// 	'loc': [75, -15],
+	// 	'font-size': 1.5
+	// }, {
 		'text': '<tspan dx="3.5%">South</tspan><tspan dx="-3.5%" dy="2.5%">China Sea</tspan>',
 		'loc': [109, 16],
 		'font-size': 0.6
@@ -60,18 +60,14 @@ var playButtonElement = null;
 var isMobile = false;
 var playbackYear = 2006;
 var isPlaying = false;
+var hasPlayed = false;
 
 function init() {
-	yearElement = d3.select('#year');
-	playButtonElement = d3.select('#play')
-
 	request.json('data/borders-topo.json', function(error, data) {
 		bordersData = topojson.feature(data, data['objects']['ne_110m_admin_0_countries']);
 
 		request.json('data/attacks.json', function(error, data) {
 			attacksData = data;
-
-			playButtonElement.on('click', onPlayButtonClicked);
 
 			render();
 		});
@@ -95,6 +91,15 @@ function render() {
 			isMobile = false;
 	}
 
+	if (isPlaying) {
+		playbackYear = playbackYear + 1;
+
+		if (playbackYear == 2015) {
+			isPlaying = false;
+			hasPlayed = true;
+		}
+	}
+
 	renderMap({
 		container: '#interactive-content',
 		width: width,
@@ -102,20 +107,11 @@ function render() {
 		attacks: attacksData[playbackYear.toString()]
 	});
 
-	yearElement.text(playbackYear)
-
 	// adjust iframe for dynamic content
 	fm.resize()
 
 	if (isPlaying) {
-		playbackYear = playbackYear + 1;
-
-		if (playbackYear > 2015) {
-			playbackYear = 2006;
-			isPlaying = false;
-		} else {
-			_.delay(render, PLAYBACK_SPEED);
-		}
+		_.delay(render, PLAYBACK_SPEED);
 	}
 }
 
@@ -179,33 +175,11 @@ function renderMap(config) {
 			.attr('transform', 'translate(' + margins['left'] + ',' + margins['top'] + ')');
 
 		/*
-		 * Create filters.
-		 */
-		var filters = chartElement.append('filters');
-
-		var textFilter = filters.append('filter')
-     .attr('id', 'textshadow');
-
-   	textFilter.append('feGaussianBlur')
-     .attr('in', 'SourceGraphic')
-     .attr('result', 'blurOut')
-     .attr('stdDeviation', '.25');
-
-		var landFilter = filters.append('filter')
-      .attr('id', 'landshadow');
-
-    landFilter.append('feGaussianBlur')
-      .attr('in', 'SourceGraphic')
-      .attr('result', 'blurOut')
-      .attr('stdDeviation', '3');
-
-		/*
 		 * Create geographic elements.
 		 */
 		chartElement.append('path')
       .attr('class', 'landmass')
       .datum(config['borders'])
-	      // .attr('filter', 'url(#landshadow)')
 	      .attr('d', geoPath);
 
 		chartElement.append('path')
@@ -216,35 +190,27 @@ function renderMap(config) {
 		/*
      * Render place labels.
      */
-    var layers = [
-      'labels shadow',
-      'labels'
-    ];
-
-    layers.forEach(function(layer) {
-      chartElement.append('g')
-        .attr('class', layer)
-        .selectAll('.label')
-        .data(LABELS)
-        .enter().append('text')
-          .attr('class', 'label')
-          .attr('transform', function(d) {
+		if (!isMobile) {
+	    chartElement.append('g')
+	      .attr('class', 'labels')
+	      .selectAll('.label')
+	      .data(LABELS)
+	      .enter().append('text')
+	        .attr('class', 'label')
+	        .attr('transform', function(d) {
 						var rotate = d['rotate'] || LABEL_DEFAULTS['rotate'];
-            return 'translate(' + projection(d['loc']) + ') rotate(' + rotate + ')';
-          })
-          .style('text-anchor', function(d) {
+	          return 'translate(' + projection(d['loc']) + ') rotate(' + rotate + ')';
+	        })
+	        .style('text-anchor', function(d) {
 						return d['text-anchor'] || LABEL_DEFAULTS['text-anchor'];
 					})
 					.style('font-size', function(d) {
 						return ((d['font-size'] || LABEL_DEFAULTS['font-size']) * scaleFactor * 100).toString() + '%';
-          })
-          .html(function(d) {
-            return d['text'];
-          });
-    });
-
-    d3.selectAll('.shadow')
-      // .attr('filter', 'url(#textshadow)');
+	        })
+	        .html(function(d) {
+	          return d['text'];
+	        });
+		}
 
 		// Attacks
 		var attacks = chartElement.append('g')
@@ -254,6 +220,29 @@ function renderMap(config) {
 			.data(config['attacks'])
 			.enter().append('path')
 				.attr('d', geoPath);
+
+		// Year button
+		chartElement.append('text')
+			.attr('class', 'year')
+			.attr('transform', 'translate(' + projection([80, -30]) + ') scale(' + scaleFactor + ')')
+			.text(playbackYear)
+
+		// Play button
+		if (!isPlaying) {
+			var controls = chartElement.append('g')
+				.attr('class', 'controls')
+				.attr('transform', 'translate(' + projection([67, -38]) + ') scale(' + scaleFactor + ')')
+				.on('click', onPlayButtonClicked);
+
+			controls.append('polygon')
+				.attr('points', '0,0 0,40 40,20')
+
+			controls.append('text')
+				.attr('class', 'play')
+				.attr('dx', 50)
+				.attr('dy', 35)
+				.text('Play')
+		}
 }
 
 $(document).ready(function () {

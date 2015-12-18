@@ -2,6 +2,7 @@
 
 svg {
   background-color: $qz-map-water;
+  border: 1px solid $qz-map-land-fill;
 }
 
 path.borders {
@@ -14,20 +15,49 @@ path.borders {
   stroke: black;
   stroke-width: 1px;
   stroke-opacity: 50%;
-  fill: red;
+  fill: $qz-map-highlight;
   opacity: 0.5;
   width: 50%;
 }
 
 .labels text {
-    fill: #787878;
-    font-family: Helvetica, Arial, sans-serif;
-    -webkit-font-smoothing: antialiased;
+  fill: #787878;
+  font-family: Helvetica, Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
 }
 
 .labels.shadow text {
-    fill: #fff;
-    stroke: #fff;
-    stroke-width: 2px;
-    opacity: .7;
+  fill: #fff;
+  stroke: #fff;
+  stroke-width: 2px;
+  opacity: .7;
+}
+
+text.year {
+  fill: $qz-map-highlight;
+  font-family: Helvetica, Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  text-anchor: middle;
+  font-size: 750%;
+  opacity: 0.5;
+}
+
+.controls {
+  polygon {
+    fill: $qz-map-highlight
+  }
+
+  text {
+    fill: $qz-map-highlight;
+    font-family: Helvetica, Arial, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    font-size: 300%;
+  }
+
+  &:hover {
+    path, polygon, text.play {
+      fill: $qz-purp-1;
+      cursor: pointer;
+    }
+  }
 }
