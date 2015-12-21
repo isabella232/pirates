@@ -126,7 +126,6 @@ function renderMap(config) {
     /*
      * Setup
      */
-		var aspectRatio = 5 / 3.2;
 		var defaultScale = 350;
 		var defaultDotSize = 3;
 
@@ -139,6 +138,7 @@ function renderMap(config) {
 
     // Calculate actual chart dimensions
 		var width = config['width'];
+    var aspectRatio = (width >= 940) ? (5 / 3) : (5 / 3.2);
 		var height = width / aspectRatio;
 
     var chartWidth = width - (margins['left'] + margins['right']);
