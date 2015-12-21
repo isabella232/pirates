@@ -145,7 +145,7 @@ function renderMap(config) {
     var chartHeight = height - (margins['top'] + margins['bottom']);
 
 		var mapCenter = [53, 8];
-		var scaleFactor = chartWidth / DEFAULT_WIDTH;
+		var scaleFactor = Math.min(940, chartWidth) / DEFAULT_WIDTH;
 		var mapScale = scaleFactor * defaultScale;
 
 		var projection = d3.geo.cylindricalEqualArea()
@@ -254,7 +254,7 @@ function renderMap(config) {
 				.attr('d', arrowLine([
 					[55.5, 0],
 					[55.5, 4],
-					[46, 4]
+					[48, 4]
 				]))
 				.style('marker-end', 'url(#arrowhead)');
 
@@ -278,16 +278,16 @@ function renderMap(config) {
 			.enter().append('path')
 				.attr('d', geoPath);
 
-		// Year button
+		// Year display
 		chartElement.append('text')
 			.attr('class', 'year')
-			.attr('transform', 'translate(' + projection([80, -25]) + ') scale(' + scaleFactor + ')')
+			.attr('transform', 'translate(' + projection([58, -25]) + ') scale(' + scaleFactor + ')')
 			.text(playbackYear)
 
 		// Play button
 		var controls = chartElement.append('g')
 			.attr('class', 'controls')
-			.attr('transform', 'translate(' + projection([67, -30]) + ') scale(' + scaleFactor + ')')
+			.attr('transform', 'translate(' + projection([67, -31]) + ') scale(' + scaleFactor + ')')
 
     if (!isPlaying) {
 			controls.append('polygon')
@@ -298,8 +298,8 @@ function renderMap(config) {
 				.attr('dy', 35)
 				.text('Play')
 
-			var nw = projection([65, -28]);
-			var se = projection([95, -42]);
+			var nw = projection([65, -29]);
+			var se = projection([92, -41]);
 
 			// Click area
 			chartElement.append('rect')
@@ -307,6 +307,8 @@ function renderMap(config) {
 				.attr('transform', 'translate(' + nw + ')')
 				.attr('width', se[0] - nw[0])
 				.attr('height', se[1] - nw[1])
+        .attr('rx', isMobile ? 3 : 5)
+        .attr('ry', isMobile ? 3 : 5)
 				.on('click', onPlayButtonClicked);
 		}
 }

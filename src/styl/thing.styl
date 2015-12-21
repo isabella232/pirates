@@ -1,5 +1,10 @@
 // Interactive-specific css here
 
+border-radius()
+  -webkit-border-radius: arguments
+  -moz-border-radius: arguments
+  border-radius: arguments
+
 svg {
   background-color: $qz-map-water;
 }
@@ -31,10 +36,9 @@ svg {
 }
 
 text.year {
-  fill: $qz-map-highlight;
+  fill: $qz-gray-2;
   font-family: 'AdelleSans-Regular', Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
-  text-anchor: middle;
   font-size: 750%;
   opacity: 0.5;
 }
@@ -55,20 +59,21 @@ path.arrow {
 
 .controls {
   polygon {
-    fill: $qz-map-highlight;
+    fill: $qz-gray-3;
   }
 
   text {
-    fill: $qz-map-highlight;
+    fill: $qz-gray-3;
     font-family: 'AdelleSans-Regular', Helvetica, Arial, sans-serif;
     -webkit-font-smoothing: antialiased;
     font-size: 300%;
   }
 }
 
-.play {
-  fill: blue;
-  opacity: 0;
+rect.play {
+  fill: rgba(200,200,200,0.3);
+  stroke-width: 2px;
+  stroke: $qz-gray-2;
 
   &:hover {
     cursor: pointer;
@@ -84,5 +89,13 @@ path.arrow {
 @media screen and (max-width: 600px) {
   .attacks path {
     stroke-width: 0;
+  }
+
+  rect.play {
+    stroke-width: 1px;
+  }
+
+  #footer {
+    font-size: 60%;
   }
 }
