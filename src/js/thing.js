@@ -315,7 +315,7 @@ function renderMap(config) {
     chartElement.append('text')
       .attr('id', 'footer')
       .attr('x', 0)
-      .attr('y', chartHeight * 0.995)
+      .attr('y', chartHeight * 0.99)
       .text('* Each dot represents one pirate attack.')
 }
 
