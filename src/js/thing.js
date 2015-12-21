@@ -60,6 +60,7 @@ function init() {
 			attacksData = data;
 
 			render();
+      $(window).resize(throttle(resize, 250));
 		});
 	});
 }
@@ -320,7 +321,5 @@ function renderMap(config) {
 }
 
 $(document).ready(function () {
-	fm.resize()
-	$(window).resize(throttle(resize, 250));
 	init();
 });
