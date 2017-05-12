@@ -117,7 +117,6 @@ function render() {
 
 function resize() {
 	render()
-	fm.resize()
 }
 
 /*
